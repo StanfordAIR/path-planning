@@ -3,7 +3,7 @@ import numpy as np
 import numpy.linalg as linalg
 from math import floor, ceil
 
-def quantize_path(path : list, rn_path : np.ndarray, quantization_distance : float) -> np.ndarray:
+def quantize_path(path: list, rn_path: np.ndarray, quantization_distance: float) -> np.ndarray:
     """Quantizes a given graph path -> a path in Rn. Guaranteed that endpoints are included
     Args:
         path: Contains a list of vertex names in order of the path.
