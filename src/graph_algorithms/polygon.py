@@ -43,7 +43,6 @@ class Polygon:
         Returns:
             odd_nodes: true iff point in polygon
         """
-
         x = point.lon
         y = point.lat
         j = self.corner_count - 1
