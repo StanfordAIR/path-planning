@@ -1,3 +1,11 @@
+# -*- coding: utf-8 -*-
+"""polygon.py
+
+Description
+
+Todo:
+    * Add todo
+"""
 from typing import List
 
 import numpy as np

@@ -1,3 +1,9 @@
+# -*- coding: utf-8 -*-
+"""build_initial_graph.py
+Builds the initial graph, within the flight boundary and outside obstacles.
+Todo:
+    * Add todo
+"""
 from typing import List
 
 import networkx as nx

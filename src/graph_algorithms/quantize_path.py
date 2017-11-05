@@ -1,3 +1,11 @@
+# -*- coding: utf-8 -*-
+"""quantize_path.py
+
+Description
+
+Todo:
+    * Add todo
+"""
 import networkx as nx
 import numpy as np
 import numpy.linalg as linalg
