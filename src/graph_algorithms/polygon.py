@@ -27,9 +27,9 @@ class Polygon:
         self.poly_y = np.array([p.lat for p in boundary])
         self.constant = np.zeros(self.poly_x.size)
         self.multiple = np.zeros(self.poly_x.size)
-        
+
         j = self.corner_count - 1
-    
+
         for i in range(self.corner_count):
             if self.poly_y[i] == self.poly_y[j]:
                 self.constant[i] = self.poly_x[i]
