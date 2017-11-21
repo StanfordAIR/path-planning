@@ -83,7 +83,7 @@ def features(state, locs=[], rads=[]):
     objective = [state - OBJECTIVE]
     #obstacles = [(state - locs[i]) * ((state-locs[i]).dot(state-locs[i]) < 3*rads[i]**2)
      #            for i in range(len(locs))]
-    obstacles = [(state - locs[i]) * (((state-locs[i]).dot(state-locs[i]))**(-1))
+    obstacles = [(state - locs[i]) * (rads[i] * ((state-locs[i]).dot(state-locs[i]))**(-1))
                 for i in range(len(locs))]
     return np.vstack(objective + obstacles).flatten()
 
@@ -121,7 +121,7 @@ def gen_obstacles(num=3, radius_mean=5, radius_std=2):
     return locs, rads
 
 
-def learn(iters=5, samples=1000, param=None):
+def learn(iters=6, samples=1000, param=None):
     locs, rads = gen_obstacles()
     n = len(features(START, locs, rads))
     if (param == None):
@@ -152,6 +152,7 @@ def learn(iters=5, samples=1000, param=None):
         param = best_fit(X, Y)        
         
         if (t%5 == 0):
+            locs, rads = gen_obstacles()
             print(value(START, param, locs, rads))
             
     print('Done')
