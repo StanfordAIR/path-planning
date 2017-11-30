@@ -48,11 +48,7 @@ def xgrid_graph(col_count: int, row_count: int,
 
     # Add position node attributes
     if with_positions:
-        r_positions = (r for c in cols for r in rows)
-        c_positions = (c for c in cols for r in rows)
-        # switched row / column for display in (row, column) format
-        pos = {(c, r): (c, r) for r, c in zip(r_positions, c_positions)
-               if (c, r) in graph}
+        pos = {node: node for node in graph}
         set_node_attributes(graph, pos, 'pos')
 
     return graph

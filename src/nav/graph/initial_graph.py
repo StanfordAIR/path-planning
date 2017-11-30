@@ -2,12 +2,12 @@
 """build_initial_graph.py
 Builds the initial graph, within the flight boundary and outside obstacles.
 Todo:
-    * Add todo
+    * Add flight boundary check with polygon
 """
 from .xgrid import xgrid_graph
 
-from .utility_classes import Location
-from .utility_classes import Obstacle
+from nav.utility.classes import Location
+from nav.utility.classes import Obstacle
 
 from typing import List
 from typing import Tuple

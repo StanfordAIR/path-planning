@@ -6,7 +6,7 @@ Description
 Todo:
     * Add todo
 """
-from .utility_classes import Location
+from nav.utility.classes import Location
 
 from typing import List
 
