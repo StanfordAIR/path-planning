@@ -24,4 +24,8 @@ def grid(n, envs, sols=None):
                                 obs[2], color='r', fill=False)
             ax[ax_x, ax_y].add_artist(circle)
 
+        if sols != None:
+            sol = sols[i]
+            ax[ax_x, ax_y].plot(sol[0], sol[1], 'ro')
+
     plt.show()
