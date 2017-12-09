@@ -17,19 +17,19 @@ import numpy as np
 import matplotlib.pyplot as plt
 
 def build_graph(boundary: List[Location], stat_obstacles: List[Obstacle],
-          granularity: float) -> nx.Graph:
+                params) -> nx.Graph:
     """Builds a space-filling graph within flight boundaries and removes nodes in obstacles.
     Args:
         boundary: the gps locations of the polygon defining the flight boundary
         stat_obstacles: the locations and sizes of the stationary obstacles
-        granularity: the distance between graph nodes for (lat, lon)
+        params: algorithm parameters dictionary
     Returns:
         graph: a graph filling the space, whose nodes are Locations
     """
     # space filling graph
     min_boundary = Location(*(min(coord) for coord in zip(*boundary)))
     max_boundary = Location(*(max(coord) for coord in zip(*boundary)))
-    graph_size = Location.granularity_diff(max_boundary, min_boundary, granularity)
+    graph_size = Location.granularity_diff(max_boundary, min_boundary, params["granularity"])
     
     graph = xgrid_graph(*graph_size)
 
@@ -38,7 +38,7 @@ def build_graph(boundary: List[Location], stat_obstacles: List[Obstacle],
     for obs in stat_obstacles:
         to_remove = set()
         for node in graph:
-            loc = Location.from_grid(node, graph_origin, granularity)
+            loc = Location.from_grid(node, graph_origin, params["granularity"])
             if loc in obs:
                 to_remove.add(node)
         for node in to_remove:

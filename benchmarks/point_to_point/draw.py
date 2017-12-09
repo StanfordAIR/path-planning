@@ -3,12 +3,14 @@
 Draws the first 9 environments from environments.py
 """
 
+import math
 import matplotlib.pyplot as plt
 from .problem import area
 from .problem import waypoints
 
-def grid(n, envs, sols=None):
-    fig, ax = plt.subplots(nrows=n, ncols=n, sharex=True, sharey=True, figsize=(7,7))
+def grid(num_displays, envs, sols=None):
+    n = int(math.sqrt(num_displays))
+    fig, ax = plt.subplots(nrows=n, ncols=n, sharex=True, sharey=True, figsize=(7,7), squeeze=False)
     ((x_min, y_min), (x_max, y_max)) = area
     ((wx_min, wy_min), (wx_max, wy_max)) = waypoints
 
