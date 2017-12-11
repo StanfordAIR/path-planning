@@ -14,7 +14,7 @@ from pprint import pprint
 
 ######################################
 # SPECIFY TEST
-ENVIRONMENT_ID = 12345
+ENVIRONMENT_ID = 123456
 ENVIRONMENT_COUNT = 16
 NUM_DISPLAY_ENVS = 16 # must be perfect square < ENVIRONMENT_COUNT
 ######################################
@@ -41,7 +41,8 @@ for i, env in enumerate(envs):
 
     try:
         flight_path = solve.point_to_point(boundary, waypoints,
-                                           stat_obstacles, params, verbose=False)
+                                           stat_obstacles, params, verbose=False,
+                                           display=False)
     except Exception as e:
         print(e)
         flight_path = np.array([[wx_min, wx_max], [wy_min, wy_max]])
