@@ -15,7 +15,7 @@ import numpy as np
 import scipy.linalg as linalg
 
 def optimize_path(quantized_path: np.ndarray, boundary: List[Location],
-                  stat_obstacles: List[Obstacle], params) -> np.ndarray:
+                  stat_obstacles: List[Obstacle], params, verbose=True) -> np.ndarray:
     """Smooths the graph path
     Args:
         quantized_path: TODO
@@ -91,13 +91,15 @@ def optimize_path(quantized_path: np.ndarray, boundary: List[Location],
                 curr_step *= .8
             if curr_step < MIN_STEP:
                 if times_increased > MAX_TIME_INCREASE:
-                    print('Cooling schedule is finished. Converged to final result.')
+                    if verbose:
+                        print('Cooling schedule is finished. Converged to final result.')
                     converged = True
                     break
                 # Once the cooling step converges, increase the constraint hardness
                 # such that the optimization can finish
-                print('Converged in cooling step; increasing schedule'
-                      '(C={}) and resetting velocity'.format(constraint_hardness))
+                if verbose:
+                    print('Converged in cooling step; increasing schedule'
+                          '(C={}) and resetting velocity'.format(constraint_hardness))
                 prev_velocity = np.zeros(prev_velocity.shape)
                 constraint_hardness *= FAST_COOLING_SCHEDULE
                 
@@ -109,7 +111,7 @@ def optimize_path(quantized_path: np.ndarray, boundary: List[Location],
         constraint_hardness *= COOLING_SCHEDULE
         
         
-        if i%10==0:
+        if i%10==0 and verbose:
             fig = plt.figure()
             ax = fig.add_subplot(111)
             plot_path(curr_pos, circ_pos, np.sqrt(circ_radius2), fig, ax, 'Iteration: {}'.format(i))
