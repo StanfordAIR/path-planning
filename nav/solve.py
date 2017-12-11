@@ -7,7 +7,7 @@ from nav.utility.classes import Location, Obstacle
 import networkx as nx
 import matplotlib.pyplot as plt
 
-def point_to_point(boundary, waypoints, stat_obstacles, params, display=False):
+def point_to_point(boundary, waypoints, stat_obstacles, params, display=False, verbose=True):
     # Parameters
     granularity = params["granularity"]
     quantization_distance = params["quantization_distance"]
@@ -35,7 +35,7 @@ def point_to_point(boundary, waypoints, stat_obstacles, params, display=False):
             ax[1].add_artist(circle)
     
     # Flight Path
-    flight_path = optimize_path(quantized_path, boundary, stat_obstacles, params)
+    flight_path = optimize_path(quantized_path, boundary, stat_obstacles, params, verbose=verbose)
 
     if display:
         ax[2].axis((-50.0, 150.0, -50.0, 150.0)) #TODO replace hardcoded values

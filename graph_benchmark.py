@@ -10,15 +10,17 @@ import numpy as np
 import networkx as nx
 import matplotlib.pyplot as plt
 import pickle
+from pprint import pprint
 
 ######################################
 # SPECIFY TEST
 ENVIRONMENT_ID = 12345
-ENVIRONMENT_COUNT = 10
-NUM_DISPLAY_ENVS = 9 # must be perfect square < ENVIRONMENT_COUNT
+ENVIRONMENT_COUNT = 16
+NUM_DISPLAY_ENVS = 16 # must be perfect square < ENVIRONMENT_COUNT
 ######################################
 
 params = pickle.load(open("graph_params.pkl", "rb"))
+pprint(params)
 
 # Set problem variables
 ((x_min, y_min), (x_max, y_max)) = problem.area
@@ -39,7 +41,7 @@ for i, env in enumerate(envs):
 
     try:
         flight_path = solve.point_to_point(boundary, waypoints,
-                                           stat_obstacles, params)
+                                           stat_obstacles, params, verbose=False)
     except Exception as e:
         print(e)
         flight_path = np.array([[wx_min, wx_max], [wy_min, wy_max]])
