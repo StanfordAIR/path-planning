@@ -48,7 +48,7 @@ for i, env in enumerate(envs):
         x = np.array([data[i,0] for i in range(len(data))])
         y = np.array([data[i,1] for i in range(len(data))])
         
-        flight_path = np.vstack( [x,y] ) # your function to calculate the path, i.e func(env)
+        flight_path = np.vstack( (x,y) )
         
         #####################################
         

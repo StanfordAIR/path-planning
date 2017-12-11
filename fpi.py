@@ -85,7 +85,8 @@ def reward(state, locs=[], rads=[], top=TOP, bot=BOT, pen=PENALTY):
 def features(state, locs=[], rads=[]):
     sorting = sorted(range(len(locs)), key=lambda i: lin.norm(state-locs[i]) - rads[i])
     objective = [state - OBJECTIVE]
-    obstacles = [(state - locs[i]) * (lin.norm(state - locs[i])-rads[i])**(-2) * ( lin.norm(state-locs[i]) < 3*rads[i])
+    obstacles = [(state - locs[i]) * (lin.norm(state - locs[i])-rads[i])**(-2) 
+                * ( lin.norm(state-locs[i]) < 3*rads[i])
                  for i in sorting]
     #obstacles = [(state - locs[i]) * rads[i] * (lin.norm(state-locs[i]))**(-2)
     #           for i in range(len(locs))]
@@ -94,7 +95,7 @@ def features(state, locs=[], rads=[]):
 
 def simple_policy(state, parameters, locs=[], rads=[], 
                   feature_map=features):
-    return feature_map(state, locs, rads).dot(parameters)
+    return closest(feature_map(state, locs, rads).dot(parameters))
 
 
 
@@ -175,7 +176,7 @@ def verify_state(s, locs, rads):
             return s
 
 
-def learn(iters=1, samples=500, param=None):
+def learn(iters=1, samples=500, param=None, quickstop=True):
     locs, rads = gen_obstacles()
     n = len(features(START, locs, rads))
     if (param == None):
@@ -212,7 +213,7 @@ def learn(iters=1, samples=500, param=None):
             
             param = best_fit(X, Y)        
             
-            perf = test_success_rate(param, 100, 20)
+            perf = test_success_rate(param, 500, 20)
             #if (perf[0] <= performances[len(performances)-1][0] - 0.05):
             #    param = old_param
             #    print('No positive change')
@@ -221,9 +222,9 @@ def learn(iters=1, samples=500, param=None):
             past_fits += [param[:]]
             print('Success rate:', perf, round((perf[0]-perf[1])/(1-perf[1]),2) )
                 
-            if (perf[0] >= 0.75):
+            if (perf[0] >= 0.75 and quickstop):
                 if(input('Save? ' ) == 'y'):
-                    pickle.dump((param, performances, past_fits), open('linear.pickle', 'wb'))
+                    pickle.dump((param, performances, past_fits), open('linear' + str(perf[0]) + '.pickle', 'wb'))
                 if(input('Stop early? ') == 'y'):  # Early stopping
                     break
             
@@ -250,7 +251,7 @@ def test(rule, locs=None, rads=None, visual=False):
     
     s = START
     data = [s]
-    for t in range(500):
+    for t in range(1000):
         s_next = sim(s, simple_policy(s, rule, locs, rads))
         data.append(s[:])
         s = s_next
@@ -271,9 +272,18 @@ def test(rule, locs=None, rads=None, visual=False):
     return data
 
 
+def main():
+    rule, results, past = learn(iters=100, samples=1000, quickstop=False)
+    pickle.dump((rule, results, past), open('overnight.pickle', 'wb'))
 
 #rule, results, past = learn()
 #print(test(rule))
 
+#main()
 
+#rule, results, past = pickle.load(open('overnight.pickle', 'rb'))
+#x = [res[0] for res in results]
+#y = [res[1] for res in results]
+#plt.plot(x)
+#plt.plot(y)
 
