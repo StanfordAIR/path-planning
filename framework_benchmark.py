@@ -13,8 +13,8 @@ import pickle
 ######################################
 # SPECIFY TEST
 ENVIRONMENT_ID = 12345 # random seed for environments, defines the environment list
-ENVIRONMENT_COUNT = 10 # number of environments in environment list envs
-NUM_DISPLAY_ENVS = 9 # must be perfect square < ENVIRONMENT_COUNT
+ENVIRONMENT_COUNT = 100 # number of environments in environment list envs
+NUM_DISPLAY_ENVS = 16 # must be perfect square < ENVIRONMENT_COUNT
 ######################################
 
 # Set problem variables

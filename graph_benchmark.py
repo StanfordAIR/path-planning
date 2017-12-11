@@ -14,12 +14,13 @@ from pprint import pprint
 
 ######################################
 # SPECIFY TEST
-ENVIRONMENT_ID = 123456
-ENVIRONMENT_COUNT = 16
+ENVIRONMENT_ID = 12345
+ENVIRONMENT_COUNT = 100
 NUM_DISPLAY_ENVS = 16 # must be perfect square < ENVIRONMENT_COUNT
 ######################################
 
 params = pickle.load(open("graph_params.pkl", "rb"))
+params["optim_max_iter"] = 1000
 pprint(params)
 
 # Set problem variables
