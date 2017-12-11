@@ -8,6 +8,8 @@ import numpy as np
 from .problem import area
 from .problem import waypoints
 
+EPSILON = 5
+
 def run(envs, sols):
     ((x_min, y_min), (x_max, y_max)) = area
     ((wx_min, wy_min), (wx_max, wy_max)) = waypoints
@@ -22,7 +24,7 @@ def run(envs, sols):
         bound_violation = False
 
         # check start and endpoints
-        epsilon = 0.5
+        epsilon = EPSILON
         if (not close(sol[0,0], sol[1,0], wx_min, wy_min, epsilon)
             or not close(sol[0,-1], sol[1,-1], wx_max, wy_max, epsilon)):
             # if the start or endpoints do not match
