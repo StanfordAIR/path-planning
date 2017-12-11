@@ -15,8 +15,8 @@ from pprint import pprint
 ######################################
 # SPECIFY TEST
 ENVIRONMENT_ID = 12345
-ENVIRONMENT_COUNT = 100
-NUM_DISPLAY_ENVS = 16 # must be perfect square < ENVIRONMENT_COUNT
+ENVIRONMENT_COUNT = 4
+NUM_DISPLAY_ENVS = 4 # must be perfect square < ENVIRONMENT_COUNT
 ######################################
 
 params = pickle.load(open("graph_params.pkl", "rb"))
