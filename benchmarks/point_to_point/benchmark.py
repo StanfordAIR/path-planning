@@ -28,9 +28,6 @@ def run(envs, sols):
         if (not close(sol[0,0], sol[1,0], wx_min, wy_min, epsilon)
             or not close(sol[0,-1], sol[1,-1], wx_max, wy_max, epsilon)):
             # if the start or endpoints do not match
-            print("endpoints do not match")
-            print("start: {},{}".format(sol[0,0], sol[0,1]))
-            print("end  : {},{}".format(sol[-1,0], sol[-1,1]))
             good_sol = False
 
         # check for crashes
