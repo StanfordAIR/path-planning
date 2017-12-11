@@ -34,11 +34,11 @@ for i, env in enumerate(envs):
         #         [y1, y2, y3, ..., yn]]
         # where (x1,y1) and (xn,yn) are the start and end points.
         
-        #rule, perfs, past = pickle.load(open('overnight.pickle', 'rb'))
-        #x = [per[0] for per in perfs]
-        #rule = past[np.argmax(x)]
+        rule, perfs, past = pickle.load(open('overnight.pickle', 'rb'))
+        x = [per[0] for per in perfs]
+        rule = past[np.argmax(x)]
         
-        rule, perfs = pickle.load(open('linear.pickle', 'rb'))
+        #rule, perfs = pickle.load(open('linear.pickle', 'rb'))
         
         #for obs in env:
         #    print(obs)
