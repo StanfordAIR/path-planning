@@ -8,7 +8,7 @@ import numpy as np
 from .problem import area
 from .problem import waypoints
 
-EPSILON = 5
+EPSILON = 15
 
 def run(envs, sols):
     ((x_min, y_min), (x_max, y_max)) = area
