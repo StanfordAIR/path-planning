@@ -15,8 +15,8 @@ from pprint import pprint
 ######################################
 # SPECIFY TEST
 ENVIRONMENT_ID = 12345
-ENVIRONMENT_COUNT = 1
-NUM_DISPLAY_ENVS = 1 # must be perfect square < ENVIRONMENT_COUNT
+ENVIRONMENT_COUNT = 16
+NUM_DISPLAY_ENVS = 16 # must be perfect square < ENVIRONMENT_COUNT
 ######################################
 
 params = pickle.load(open("graph_params.pkl", "rb"))
@@ -43,7 +43,7 @@ for i, env in enumerate(envs):
     try:
         flight_path = solve.point_to_point(boundary, waypoints,
                                            stat_obstacles, params, verbose=False,
-                                           display=True)
+                                           display=False)
     except Exception as e:
         print(e)
         flight_path = np.array([[wx_min, wx_max], [wy_min, wy_max]])
