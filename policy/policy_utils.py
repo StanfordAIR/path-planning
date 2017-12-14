@@ -5,8 +5,10 @@ A shared library for all the tools for policy iteration.
 """
 
 import numpy as np
-import matplotlib.pyplot as plt
 import numpy.linalg as lin
+import numpy.random as nprand
+
+import matplotlib.pyplot as plt
 import pickle
 
 MAP_TOP = 150
@@ -16,10 +18,16 @@ PENALTY = -10**(-8)
 START = np.zeros(2)
 FINISH = 100 * np.ones(2)
 
-NUM_ACTIONS = 9
+NUM_OBS = 5
+RADM = 15
+RADSTD = 5
+
+EPSILON = 15
+TIME_CAP = 250
+
+NUM_ACTIONS = 8
 ACTIONS = [np.array((np.cos(theta), np.sin(theta))) for theta 
-           in np.linspace(0, 2*np.pi, num=NUM_ACTIONS-1, endpoint=False)]
-ACTIONS += np.zeros(2)
+           in np.linspace(0, 2*np.pi, num=NUM_ACTIONS, endpoint=False)]
 
 
 """
@@ -99,25 +107,121 @@ def value(pos, locs, rads, policy, params, discount=0.9, duration=15):
     return val
 
 
-def gen_obstacles(num=8, rad_mean=15, rad_std=5):
+def gen_obstacles():
     """
-    Generate obstacles over the map.
+    Generate obstacles across the map.
     """
-    locs = np.random.randint(MAP_BOT, MAP_TOP, size=(num,2))
-    rads = np.random.normal(rad_mean, rad_std, size=num)
+    locs = nprand.randint(MAP_BOT, MAP_TOP, (NUM_OBS,2))
+    rads = nprand.normal(RADM, RADSTD, NUM_OBS)
     
-    for i in range(num):  # Remove invalid obstacles.
+    for i in range(NUM_OBS):  # Remove invalid obstacles.
         if (lin.norm(locs[i]-START) <= rads[i] 
         or lin.norm(locs[i]-FINISH) <= rads[i]):
-            locs[i,:2] = -50 * np.ones(2)
+            locs[i] = MAP_BOT * np.ones(2)
             rads[i] = 1
     return locs, rads
 
 
+def _validate_pos(pos, locs, rads):
+    """
+    Check if the position is not inside any obstacles. If so, return a new
+    position.
+    """
+    while (_obs_reward(pos, locs, rads) < 0):
+        pos = nprand.uniform(MAP_BOT, MAP_TOP, 2)
+    return pos
+
+
 def gen_training_states(samples):
+    """
+    Generate a random sample of states across the map.
+    """
     states = []
-    # TODO
+    for sample in range(samples):
+        locs, rads = gen_obstacles()
+        pos = _validate_pos(nprand.uniform(MAP_BOT, MAP_TOP, 2), locs, rads)
+        states += [(pos,locs,rads)]
+    return states
+
 
 """
-
+Testing and Visualization
+    collision
+    straight_policy
+    test
+    batch_test
+    plot_performance
 """
+
+def _circle(loc, rad, resolution=500):
+    """ 
+    Generate the x,y coordinates that define a circle.
+    """
+    t = np.linspace(0, 2*np.pi, resolution)
+    return rad * np.cos(t) + loc[0] , rad * np.sin(t) + loc[1]
+
+
+def _collision(pos, locs, rads):
+    for i in range(len(locs)):
+        if (lin.norm(pos - locs[i]) < rads[i]):
+            return True
+    return False
+
+
+def straight_policy(pos, locs, rads, params):
+    return (np.sqrt(2)/2) * np.ones(2)
+
+
+def test(locs, rads, policy, params):
+    """
+    Test out a policy's performance on some map.
+    """
+    pos = START
+    t = 0
+    history = [pos]
+    while(lin.norm(pos - FINISH) > EPSILON and t < TIME_CAP):
+        pos = sim(pos, policy(pos, locs, rads, params))
+        if(_collision(pos, locs, rads)):
+            break
+        history += [pos]
+        t += 1
+    
+    success = 1 if lin.norm(pos - FINISH) < EPSILON else 0
+    return success, history
+
+
+def batch_test(samples, policy, params):
+    """
+    Test the policy on multiple examples and compare to a baseline.
+    """
+    model_count = 0
+    baseline_count = 0
+    test_data = gen_training_states(samples)
+    for pos, locs, rads in test_data:
+        model_count += test(locs, rads, policy, params)[0]
+        baseline_count += test(locs, rads, straight_policy, None)[0]
+    return round(model_count/samples, 2), round(baseline_count/samples, 2)
+        
+
+def plot_performance(history, locs, rads, figsize=8):
+    """
+    Plot a path and set of obstacles.
+    """
+    # Set up figure.
+    plt.figure(figsize=(figsize,figsize))
+    plt.ylim(MAP_BOT, MAP_TOP)
+    plt.xlim(MAP_BOT, MAP_TOP)
+    plt.grid()
+
+    # Plot path.
+    x = [pos[0] for pos in history]
+    y = [pos[1] for pos in history]
+    plt.scatter(x, y, marker='.', s=50)
+    
+    # Plot obstacles.
+    for i in range(len(locs)):
+        x, y = _circle(locs[i], rads[i])
+        plt.scatter(x, y, marker='.', color='r', s=1)
+        
+    plt.show()
+    
