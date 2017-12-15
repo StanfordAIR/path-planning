@@ -6,6 +6,7 @@ Contains the learning agent class for different policy iteration models.
 import numpy as np
 import numpy.random as nprand
 import matplotlib.pyplot as plt
+from copy import deepcopy
 
 import policy_utils as ut
 
@@ -61,7 +62,7 @@ class PolicyAgent():
             params = update(params, X, Y)        
             
             perf = ut.batch_test(test_sample, policy, params)
-            self.history += [params[:]]
+            self.history += [deepcopy(params)]
             self.performances += [perf]
             
             if (feedback):
