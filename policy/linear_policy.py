@@ -51,5 +51,5 @@ def initialize():
     return np.zeros(n)
 
 
-agent = PolicyAgent(policy, update, feature, label, initialize())
-agent.train(iters=30)
+#agent = PolicyAgent(policy, update, feature, label, initialize())
+#agent.train(iters=30)
