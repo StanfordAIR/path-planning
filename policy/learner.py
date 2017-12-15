@@ -8,11 +8,12 @@ import numpy.random as nprand
 import matplotlib.pyplot as plt
 from copy import deepcopy
 
-import policy_utils as ut
+import policy.policy_utils as ut
 
 
 class PolicyAgent():
-    def __init__(self, policy, update, feature, label, params):
+    def __init__(self, policy, update, feature, label, params,
+                 history=[], performances=[]):
         # Custom functions for the model.
         self.policy = policy
         self.update = update
@@ -21,6 +22,7 @@ class PolicyAgent():
         self.label = label
         
         self.params = params
+        
         self.history = []
         self.performances = []
         
@@ -90,6 +92,9 @@ class PolicyAgent():
     
     
     def plot_history(self):
+        """
+        Plot the training history.
+        """
         y1 = [perf[0] for perf in self.performances]
         y2 = [perf[1] for perf in self.performances]
         
@@ -97,3 +102,12 @@ class PolicyAgent():
         plt.plot(y2, label='Baseline')
         plt.legend()
         plt.show()
+       
+        
+    def get_data(self):
+        """
+        Return the object data for reloading later.
+        """
+        return (self.params, self.history, self.performances)
+        
+        

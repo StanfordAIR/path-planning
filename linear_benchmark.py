@@ -12,12 +12,13 @@ import matplotlib.pyplot as plt
 import pickle
 import policy.policy_utils as ut
 from policy.learner import PolicyAgent
+import policy.linear_policy as pol
 
 ######################################
 # SPECIFY TEST
 ENVIRONMENT_ID = 12345 # random seed for environments, defines the environment list
 ENVIRONMENT_COUNT = 100 # number of environments in environment list envs
-NUM_DISPLAY_ENVS = 16 # must be perfect square < ENVIRONMENT_COUNT
+NUM_DISPLAY_ENVS = 4 # must be perfect square < ENVIRONMENT_COUNT
 ######################################
 
 # Set problem variables
@@ -57,10 +58,17 @@ for i, env in enumerate(envs):
         y = np.array([data[i,1] for i in range(len(data))])
         '''
         
-        agent = pickle.load(open('policy/linear_agent1.pkl', 'rb'))
+        data = pickle.load(open('policy/linear_data2.pkl', 'rb'))
+        
+        agent = PolicyAgent(pol.policy, pol.update, pol.feature, pol.label,
+                            data[0], data[1], data[2])
         
         locs = [np.array(obs[:2]) for obs in env]
         rads = [obs[2] for obs in env]
+        
+        while (len(locs) < 5):
+            locs += [-150 * np.ones(2)]
+            rads += [1]
         
         path = agent.get_path(locs, rads)
         

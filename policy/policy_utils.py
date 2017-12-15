@@ -21,6 +21,7 @@ FINISH = 100 * np.ones(2)
 NUM_OBS = 5
 RADM = 15
 RADSTD = 5
+BUFFER = 0.25
 
 EPSILON = 10
 TIME_CAP = 500
@@ -83,7 +84,7 @@ def _obs_reward(pos, locs, rads):
     Reward for not colliding with obstacles.
     """
     for i in range(len(locs)):
-        if(lin.norm(pos-locs[i]) < rads[i]):
+        if(lin.norm(pos-locs[i]) < rads[i]+BUFFER):
             return PENALTY
     return 0
 
@@ -162,7 +163,7 @@ def _circle(loc, rad, resolution=500):
 
 def _collision(pos, locs, rads):
     for i in range(len(locs)):
-        if (lin.norm(pos - locs[i]) < rads[i]-0.5):
+        if (lin.norm(pos - locs[i]) < rads[i]):
             return True
     return False
 
@@ -221,6 +222,10 @@ def plot_performance(path, locs, rads, figsize=8):
     for i in range(len(locs)):
         x, y = _circle(locs[i], rads[i])
         plt.scatter(x, y, marker='.', color='r', s=1)
+        
+    # Plot finish.
+    x, y = _circle(FINISH, EPSILON)
+    plt.scatter(x, y, marker='.', color='g', s=1)
         
     plt.show()
     
