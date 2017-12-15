@@ -65,7 +65,9 @@ class PolicyAgent():
             self.performances += [perf]
             
             if (feedback):
-                print(t, 'Success rate:', perf, round(perf[0]-perf[1],2))
+                print(t, 'Success rate:', perf[0],
+                      '/', perf[1],
+                      '\t', round(perf[0]-perf[1],2))
             
         self.params = params
         if (feedback):
