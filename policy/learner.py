@@ -5,6 +5,7 @@ Contains the learning agent class for different policy iteration models.
 """
 import numpy as np
 import numpy.random as nprand
+import matplotlib.pyplot as plt
 
 import policy_utils as ut
 
@@ -25,7 +26,9 @@ class PolicyAgent():
         
     def train(self, iters=10, train_sample=500, test_sample=250, 
               feedback=True):
-        
+        """
+        Learn a new model using policy iteration.
+        """
         policy, update = self.policy, self.update
         feature, label = self.feature, self.label
         params = self.params
@@ -42,10 +45,12 @@ class PolicyAgent():
             Y = []
             X = []
             for pos, locs, rads in train_states:
-                best_act = ut.ACTIONS[nprand.randint(0, ut.NUM_ACTIONS)]
-                best_val = ut.value(ut.sim(pos, best_act), locs, rads, policy, params)
-                for a in ut.ACTIONS:
-                    v = ut.value(ut.sim(pos, a), locs, rads, policy, params)
+                best_act = nprand.randint(0, ut.NUM_ACTIONS)
+                best_val = ut.value(ut.sim(pos, ut.ACTIONS[best_act]), 
+                                    locs, rads, policy, params)
+                for a in range(ut.NUM_ACTIONS):
+                    v = ut.value(ut.sim(pos, ut.ACTIONS[a]), 
+                                 locs, rads, policy, params)
                     if (v > best_val):
                         best_act = a
                         best_val = v
@@ -60,9 +65,32 @@ class PolicyAgent():
             self.performances += [perf]
             
             if (feedback):
-                print('Success rate:', perf)
-
+                print(t, 'Success rate:', perf, round(perf[0]-perf[1],2))
             
+        self.params = params
         if (feedback):
             print('Done')
+
     
+    def sample_run(self):
+        """
+        Test the current parameters and plot performance on a sample map.
+        """
+        ut.sample_run(self.policy, self.params)
+        
+    
+    def get_path(self, locs, rads):
+        """
+        Get the path the current model would generate.
+        """
+        return ut.test(locs, rads, self.policy, self.params)[1]
+    
+    
+    def plot_history(self):
+        y1 = [perf[0] for perf in self.performances]
+        y2 = [perf[1] for perf in self.performances]
+        
+        plt.plot(y1)
+        plt.plot(y2, label='Baseline')
+        plt.legend()
+        plt.show()

@@ -9,7 +9,7 @@ import numpy.linalg as lin
 import numpy.random as nprand
 
 import matplotlib.pyplot as plt
-import pickle
+
 
 MAP_TOP = 150
 MAP_BOT = -50
@@ -23,7 +23,7 @@ RADM = 15
 RADSTD = 5
 
 EPSILON = 15
-TIME_CAP = 250
+TIME_CAP = 500
 
 NUM_ACTIONS = 8
 ACTIONS = [np.array((np.cos(theta), np.sin(theta))) for theta 
@@ -146,7 +146,6 @@ def gen_training_states(samples):
 
 """
 Testing and Visualization
-    collision
     straight_policy
     test
     batch_test
@@ -163,7 +162,7 @@ def _circle(loc, rad, resolution=500):
 
 def _collision(pos, locs, rads):
     for i in range(len(locs)):
-        if (lin.norm(pos - locs[i]) < rads[i]):
+        if (lin.norm(pos - locs[i]) < rads[i]-0.5):
             return True
     return False
 
@@ -178,16 +177,16 @@ def test(locs, rads, policy, params):
     """
     pos = START
     t = 0
-    history = [pos]
+    path = [pos]
     while(lin.norm(pos - FINISH) > EPSILON and t < TIME_CAP):
         pos = sim(pos, policy(pos, locs, rads, params))
         if(_collision(pos, locs, rads)):
             break
-        history += [pos]
+        path += [pos]
         t += 1
     
     success = 1 if lin.norm(pos - FINISH) < EPSILON else 0
-    return success, history
+    return success, path
 
 
 def batch_test(samples, policy, params):
@@ -203,7 +202,7 @@ def batch_test(samples, policy, params):
     return round(model_count/samples, 2), round(baseline_count/samples, 2)
         
 
-def plot_performance(history, locs, rads, figsize=8):
+def plot_performance(path, locs, rads, figsize=8):
     """
     Plot a path and set of obstacles.
     """
@@ -214,8 +213,8 @@ def plot_performance(history, locs, rads, figsize=8):
     plt.grid()
 
     # Plot path.
-    x = [pos[0] for pos in history]
-    y = [pos[1] for pos in history]
+    x = [pos[0] for pos in path]
+    y = [pos[1] for pos in path]
     plt.scatter(x, y, marker='.', s=50)
     
     # Plot obstacles.
@@ -224,4 +223,13 @@ def plot_performance(history, locs, rads, figsize=8):
         plt.scatter(x, y, marker='.', color='r', s=1)
         
     plt.show()
+    
+    
+def sample_run(policy, params):
+    """
+    Generate a sample run and plot it for the user.
+    """
+    locs, rads = gen_obstacles()
+    success, path = test(locs, rads, policy, params)
+    plot_performance(path, locs, rads)
     

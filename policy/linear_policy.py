@@ -10,9 +10,6 @@ import policy_utils as ut
 from learner import PolicyAgent
 
 
-
-
-
 def policy(pos, locs, rads, params):
     """
     Generate an action given some state.
@@ -41,12 +38,11 @@ def feature(pos, locs, rads):
     return np.vstack(objective + obstacles).flatten()
 
 
-
 def label(act):
     """
     Labels for each action.
     """
-    return act
+    return ut.ACTIONS[act]
 
 
 def initialize():
