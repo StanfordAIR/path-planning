@@ -8,8 +8,10 @@ from benchmarks.point_to_point import benchmark
 import numpy as np
 import networkx as nx
 import matplotlib.pyplot as plt
+
 import pickle
-import fvi
+import policy.policy_utils as ut
+from policy.learner import PolicyAgent
 
 ######################################
 # SPECIFY TEST
@@ -34,6 +36,7 @@ for i, env in enumerate(envs):
         #         [y1, y2, y3, ..., yn]]
         # where (x1,y1) and (xn,yn) are the start and end points.
         
+        '''
         rule, perfs, past = pickle.load(open('overnight.pickle', 'rb'))
         x = [per[0] for per in perfs]
         rule = past[np.argmax(x)]
@@ -52,7 +55,17 @@ for i, env in enumerate(envs):
         data = fvi.test(rule, locs=l, rads=r)
         x = np.array([data[i,0] for i in range(len(data))])
         y = np.array([data[i,1] for i in range(len(data))])
+        '''
         
+        agent = pickle.load(open('policy/linear_agent1.pkl', 'rb'))
+        
+        locs = [np.array(obs[:2]) for obs in env]
+        rads = [obs[2] for obs in env]
+        
+        path = agent.get_path(locs, rads)
+        
+        x = np.array([loc[0] for loc in path])
+        y = np.array([loc[1] for loc in path])
         flight_path = np.vstack( (x,y) )
         
         #####################################
