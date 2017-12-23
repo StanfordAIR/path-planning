@@ -1,5 +1,0 @@
-'avg_length': 156.35546059188081,
-'avg_obs_violations': 0.01,
-'score': 156.35546059188081,
-'avg_bound_violations': 0.0,
-'success_rate': 0.99
