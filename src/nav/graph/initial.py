@@ -1,10 +1,10 @@
 # -*- coding: utf-8 -*-
-"""build_initial_graph.py
+"""initial.py
 Builds the initial graph, within the flight boundary and outside obstacles.
-Todo:
-    * Add flight boundary check with polygon
+TODO:
+    Remove nodes outside non-rectangular flight boundary
 """
-from .xgrid import xgrid_graph
+from nav.graph.xgrid import xgrid_graph
 
 from nav.utility.classes import Location
 from nav.utility.classes import Obstacle
@@ -16,7 +16,7 @@ import networkx as nx
 import numpy as np
 import matplotlib.pyplot as plt
 
-def build(boundary: List[Location], stat_obstacles: List[Obstacle],
+def build_graph(boundary: List[Location], stat_obstacles: List[Obstacle],
           granularity: float) -> nx.Graph:
     """Builds a space-filling graph within flight boundaries and removes nodes in obstacles.
     Args:
@@ -33,7 +33,7 @@ def build(boundary: List[Location], stat_obstacles: List[Obstacle],
     
     graph = xgrid_graph(*graph_size)
 
-    # TODO remove nodes in obstacles
+    # removes nodes in obstacles
     graph_origin = min_boundary
     for obs in stat_obstacles:
         to_remove = set()
@@ -44,20 +44,6 @@ def build(boundary: List[Location], stat_obstacles: List[Obstacle],
         for node in to_remove:
             graph.remove_node(node)
 
-    # TODO return mapping from location to node, node to location?
+    # TODO remove nodes outside boundary
 
     return graph, graph_origin
-
-# test if run as main
-if __name__ == "__main__":
-    boundary = [Location(-50.0, -50.0), Location(-50.0, 150.0),
-                Location(150.0, -50.0), Location(150.0, 150.0)]
-    stat_obstacles = [Obstacle(Location(0.0, 0.0), 20),
-                      Obstacle(Location(30.0, 30.0), 10)]
-    granularity = 20.0
-
-    initial_graph, _ = build(boundary, stat_obstacles, granularity)
-    plt.figure()
-    pos = nx.get_node_attributes(initial_graph, 'pos')
-    nx.draw(initial_graph, pos, with_labels=True, font_weight='bold')
-    plt.show()

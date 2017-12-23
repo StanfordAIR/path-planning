@@ -16,7 +16,7 @@ import numpy.linalg as linalg
 from math import floor, ceil
 
 
-def plan(waypoints: List[Location], graph: nx.Graph,
+def plan_graph_path(waypoints: List[Location], graph: nx.Graph,
          origin, granularity) -> np.ndarray:
     """Builds a path to the next waypoint(s)
     Args:
@@ -37,19 +37,19 @@ def plan(waypoints: List[Location], graph: nx.Graph,
         path += p[:-1]
     path += [paths[-1][-1]]
 
-    path_coords = [list(Location.from_grid(node, origin, granularity))
-                   for node in path]
-    rn_path = np.array(path_coords).T
+    return path
 
-    return path, rn_path
-
-def quantize(path: list, rn_path: np.ndarray, quantization_distance: float) -> np.ndarray:
+def quantize_graph_path(path: list, origin, granularity, quantization_distance: float) -> np.ndarray:
     """Quantizes a given graph path -> a path in Rn. Guaranteed that endpoints are included
     Args:
         path: Contains a list of vertex names in order of the path.
         rn_path: A numpy array of points in r3 of each vertex in path, where the columns are each point.
         quantization_distance: the distance between every two points in the quantization path.
     """
+    path_coords = [list(Location.from_grid(node, origin, granularity))
+                   for node in path]
+    rn_path = np.array(path_coords).T
+
     if rn_path.shape[1] <= 1:
         raise ValueError('A path must have at least two points')
     
