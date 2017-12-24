@@ -36,7 +36,7 @@ class Environment:
         # set all fields that are constant within a mission
         self.static_obs_ll = static_obs
         self.static_obs_ft = self.ll_to_ft(self.static_obs_ll, copy=True) 
-        self.graph = #TODO call function to build graph without moving obstacles
+        #self.graph = #TODO call function to build graph without moving obstacles
 
     def ll_in_ft(self):
         min_lat, min_lon = (self.min_ll[0,0], self.min_ll[0,0])
@@ -63,14 +63,8 @@ class Planner:
 
     def __init__(self, environment: Environment,
                        params: Dict[str, Any] = None): # algorithm parameters
-        # set all fields that are constant between missions
-        self.boundary = boundary
-        self.info = info
         if params:
             self.params = params
         else:
             self.params = DEFAULT_PARAMS
 
-        # set all fields that are constant within a mission
-        self.static_obs = static_obs
-        self.graph = #TODO
