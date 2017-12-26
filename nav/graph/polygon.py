@@ -6,25 +6,21 @@ Description
 Todo:
     * Add todo
 """
-from typing import List
-
 import numpy as np
-
-from utility_classes import Location
 
 class Polygon:
     """A class that represents the flight boundary and can check point containment
     See http://alienryderflex.com/polygon/ for details.
     """
 
-    def __init__(self, boundary: List[Location]):
+    def __init__(self, boundary: np.ndarray):
         """Precalculates values for checking polygon point-inclusion.
         Args:
             boundary: a list of boundary point locations
         """
-        self.corner_count = len(boundary)
-        self.poly_x = np.array([p.lon for p in boundary])
-        self.poly_y = np.array([p.lat for p in boundary])
+        self.corner_count = boundary.shape[1]
+        self.poly_x = boundary[1]
+        self.poly_y = boundary[0]
         self.constant = np.zeros(self.poly_x.size)
         self.multiple = np.zeros(self.poly_x.size)
 
@@ -44,15 +40,15 @@ class Polygon:
                                     / (self.poly_y[j] - self.poly_y[i]))
             j = i
 
-    def __contains__(self, point: Location) -> bool:
+    def __contains__(self, ll) -> bool:
         """Checks whether a point is in the polygon
         Args:
             point: a location
         Returns:
             odd_nodes: true iff point in polygon
         """
-        x = point.lon
-        y = point.lat
+        x = ll[1]
+        y = ll[0]
         j = self.corner_count - 1
         odd_nodes = False
 
@@ -63,11 +59,3 @@ class Polygon:
             j = i
 
         return odd_nodes
-
-
-# test if run as main
-if __name__ == "__main__":
-    boundary = [Location(0.0, 0.0), Location(1.1, 0.0), Location(1.1, 1.1)]
-    boundary_poly = Polygon(boundary)
-    point = Location(0.5, 1.2)
-    print(point in boundary_poly)
