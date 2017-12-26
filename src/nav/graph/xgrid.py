@@ -12,8 +12,7 @@ from networkx import Graph
 from networkx.classes import set_node_attributes
 from networkx.generators.classic import empty_graph
 
-def xgrid_graph(col_count: int, row_count: int,
-                with_positions: bool = True) -> Graph:
+def xgrid_graph(col_count: int, row_count: int, granularity: float = None) -> Graph:
     """Builds and returns an x grid.
     Args:
         col_count: the number of columns in the lattice.
@@ -25,12 +24,10 @@ def xgrid_graph(col_count: int, row_count: int,
     if col_count == 0 or row_count == 0:
         return graph
 
-    cols = range(col_count + 1)
-    rows = range(row_count + 1)
+    cols = range(col_count - 1) # why - 1 needed ?
+    rows = range(row_count - 1)
     grid_weight = 1.0
     diag_weight = math.sqrt(2 * grid_weight**2)
-    print("grid_weight = {}".format(grid_weight))
-    print("diag_weight = {}".format(diag_weight))
     # Make grid
     graph.add_edges_from((((c, r), (c + 1, r)) for r in rows
                                                for c in cols[:col_count]),
@@ -47,8 +44,8 @@ def xgrid_graph(col_count: int, row_count: int,
                          weight = diag_weight)
 
     # Add position node attributes
-    if with_positions:
-        pos = {node: node for node in graph}
+    if granularity != None:
+        pos = {node: (granularity * row, granularity * col) for (row, col) in graph}
         set_node_attributes(graph, pos, 'pos')
 
     return graph

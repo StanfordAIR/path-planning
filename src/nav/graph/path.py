@@ -17,7 +17,7 @@ from math import floor, ceil
 
 
 def plan_graph_path(waypoints: List[Location], graph: nx.Graph,
-         origin, granularity) -> np.ndarray:
+         origin, params) -> np.ndarray:
     """Builds a path to the next waypoint(s)
     Args:
         graph: inside flight boundaries and outside obstacles
@@ -26,7 +26,7 @@ def plan_graph_path(waypoints: List[Location], graph: nx.Graph,
         path: a list of locations corresponding to nodes in the graph path
     """
     # waypoints to nodes
-    nodes = [point.to_grid(origin, granularity) for point in waypoints]
+    nodes = [point.to_grid(origin, params["granularity"]) for point in waypoints]
 
     # nodes to graph path
     paths = [nx.bidirectional_dijkstra(graph, source, target, weight='weight')[1]
@@ -39,14 +39,14 @@ def plan_graph_path(waypoints: List[Location], graph: nx.Graph,
 
     return path
 
-def quantize_graph_path(path: list, origin, granularity, quantization_distance: float) -> np.ndarray:
+def quantize_graph_path(path: list, origin, params) -> np.ndarray:
     """Quantizes a given graph path -> a path in Rn. Guaranteed that endpoints are included
     Args:
         path: Contains a list of vertex names in order of the path.
         rn_path: A numpy array of points in r3 of each vertex in path, where the columns are each point.
-        quantization_distance: the distance between every two points in the quantization path.
+        params: the algorithm parameters
     """
-    path_coords = [list(Location.from_grid(node, origin, granularity))
+    path_coords = [list(Location.from_grid(node, origin, params["granularity"]))
                    for node in path]
     rn_path = np.array(path_coords).T
 
@@ -56,6 +56,7 @@ def quantize_graph_path(path: list, origin, granularity, quantization_distance: 
     dist_mat = linalg.norm(rn_path[:,:-1] - rn_path[:,1:], axis=0)
     total_norm = sum(dist_mat)
     
+    quantization_distance = params["quantization_distance"]
     if total_norm <= quantization_distance:
         raise ValueError('A path\'s total distance must be larger than the quantization distance')
 

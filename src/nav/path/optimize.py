@@ -14,7 +14,8 @@ import matplotlib.pyplot as plt
 import numpy as np
 import scipy.linalg as linalg
 
-def optimize_path(quantized_path: np.ndarray, boundary: List[Location], stat_obstacles: List[Obstacle]) -> np.ndarray:
+def optimize_path(quantized_path: np.ndarray, boundary: List[Location],
+                  stat_obstacles: List[Obstacle], params, verbose=True) -> np.ndarray:
     """Smooths the graph path
     Args:
         quantized_path: TODO
@@ -23,39 +24,38 @@ def optimize_path(quantized_path: np.ndarray, boundary: List[Location], stat_obs
     Returns:
         flight_path: TODO
     """
+    
+    # Parameters
+    MAX_ITER = params["optim_max_iter"]
+    INIT_STEP_SIZE = params["optim_init_step_size"]
+    MIN_STEP = params["optim_min_step"]
+    RESET_STEP_SIZE = params["optim_reset_step_size"]
+    COOLING_SCHEDULE = params["optim_cooling_schedule"]
+    FAST_COOLING_SCHEDULE = params["optim_fast_cooling_schedule"]
+    INIT_CONSTRAINT_HARDNESS = params["optim_init_constraint_hardness"]
+    INIT_SPRING_HARDNESS = params["optim_init_spring_hardness"]
+    MAX_TIME_INCREASE = params["optim_max_time_increase"]
+    INIT_MOMENTUM = params["optim_init_momentum"]
+    MOMENTUM_CHANGE = params["optim_momentum_change"]
+    SCALE = params["optim_scale"]
+    
     print("quantized_path.shape = {}".format(quantized_path.shape))
     num_points = quantized_path.shape[1]
     print("num_points = {}".format(num_points))
-    points = quantized_path / 100
-    
-    # Parameters
-    MAX_ITER = 1000 # from 1000
-    INIT_STEP_SIZE = 1e-3
-    MIN_STEP = 1e-2
-    RESET_STEP_SIZE = 1e-7
-    COOLING_SCHEDULE = 1.0001
-    FAST_COOLING_SCHEDULE = 1.1
-    INIT_CONSTRAINT_HARDNESS = 1
-    INIT_SPRING_HARDNESS = 20
-    MAX_TIME_INCREASE = 10
-    INITIAL_MOMENTUM = .99 # from .99
-    MOMENTUM_CHANGE = .2
-    
+    points = quantized_path * SCALE
+
     curr_pos = np.copy(points)
     constraint_hardness = INIT_CONSTRAINT_HARDNESS
     
     obstacle_centers = [[obs.location.lat, obs.location.lon] for obs in stat_obstacles]
     obstacle_radii = [obs.radius for obs in stat_obstacles]
-    circ_pos = np.array(obstacle_centers).T / 100
-    print("circ_pos = {}".format(circ_pos))
-    circ_radius2 = (np.array(obstacle_radii) / 100) **2
-    print("circ_radius2 = {}".format(circ_radius2))
-    input()
+    circ_pos = np.array(obstacle_centers).T * SCALE
+    circ_radius2 = (np.array(obstacle_radii) * SCALE) ** 2
     
     count = 0
     curr_step = INIT_STEP_SIZE
     prev_loss = float('inf')
-    momentum = INITIAL_MOMENTUM
+    momentum = INIT_MOMENTUM
     
     prev_velocity = np.zeros(curr_pos.shape)
     curr_velocity = np.copy(prev_velocity)
@@ -71,6 +71,10 @@ def optimize_path(quantized_path: np.ndarray, boundary: List[Location], stat_obs
                                                          constraint_hardness,
                                                          INIT_SPRING_HARDNESS)
             proposed_pos = curr_pos + curr_velocity
+            proposed_pos[0][0] = 0.0
+            proposed_pos[1][0] = 0.0
+            proposed_pos[0][-1] = 100.0 * SCALE
+            proposed_pos[1][-1] = 100.0 * SCALE
             curr_loss = complete_loss(proposed_pos, circ_pos, circ_radius2,
                                       constraint_hardness, INIT_SPRING_HARDNESS)
             
@@ -87,13 +91,15 @@ def optimize_path(quantized_path: np.ndarray, boundary: List[Location], stat_obs
                 curr_step *= .8
             if curr_step < MIN_STEP:
                 if times_increased > MAX_TIME_INCREASE:
-                    print('Cooling schedule is finished. Converged to final result.')
+                    if verbose:
+                        print('Cooling schedule is finished. Converged to final result.')
                     converged = True
                     break
                 # Once the cooling step converges, increase the constraint hardness
                 # such that the optimization can finish
-                print('Converged in cooling step; increasing schedule'
-                      '(C={}) and resetting velocity'.format(constraint_hardness))
+                if verbose:
+                    print('Converged in cooling step; increasing schedule'
+                          '(C={}) and resetting velocity'.format(constraint_hardness))
                 prev_velocity = np.zeros(prev_velocity.shape)
                 constraint_hardness *= FAST_COOLING_SCHEDULE
                 
@@ -105,7 +111,7 @@ def optimize_path(quantized_path: np.ndarray, boundary: List[Location], stat_obs
         constraint_hardness *= COOLING_SCHEDULE
         
         
-        if i%10==0:
+        if i%10==0 and verbose:
             fig = plt.figure()
             ax = fig.add_subplot(111)
             plot_path(curr_pos, circ_pos, np.sqrt(circ_radius2), fig, ax, 'Iteration: {}'.format(i))
@@ -116,7 +122,7 @@ def optimize_path(quantized_path: np.ndarray, boundary: List[Location], stat_obs
             print('Current step size : {}'.format(curr_step))
        
     
-    flight_path = curr_pos * 100
+    flight_path = curr_pos / SCALE
     return flight_path
 
 def plot_path(points, circles, radii, fig, ax, plot_title=''):
@@ -140,33 +146,33 @@ def phi(x):
 
 def d_phi(x):
     q = 1/(1+np.exp(x))
-    return -q*(1-q)
+    return q*(q-1) #-q*(1-q)
 
 vec_phi = np.vectorize(phi)
 vec_d_phi = np.vectorize(d_phi)
 
-def compute_loss(curr_pos, circ_mat, circ_rad, C):
-    all_dist = C*(linalg.norm(circ_mat - curr_pos[:,np.newaxis], axis=0)**2/circ_rad - 1)
+def complete_loss(pos_mat, circ_pos, circ_radius2, C, K):
+    loss_obstacles = loss(pos_mat, circ_pos, circ_radius2, C)
+    loss_diff = sum(linalg.norm(pos_mat[:,1:] - pos_mat[:,:-1], axis=0))
+    return loss_obstacles + K*loss_diff
+
+def loss(pos_mat, circ_pos, circ_radius2, C):
+    return np.sum(np.apply_along_axis(lambda x: compute_loss(x, circ_pos, circ_radius2, C), 0, pos_mat))
+
+def compute_loss(curr_pos, circ_pos, circ_radius2, C):
+    all_dist = C*(linalg.norm(circ_pos - curr_pos[:,np.newaxis], axis=0)**2/circ_radius2 - 1)
     return np.sum(phi(all_dist))
-    
-def loss(pos_mat, circ_mat, circ_rad, C):
-    return np.sum(np.apply_along_axis(lambda x: compute_loss(x, circ_mat, circ_rad, C), 0, pos_mat))
 
-def compute_dloss(curr_pos, circ_mat, circ_rad, C):
-    dif_mat = curr_pos[:,np.newaxis] - circ_mat
-    all_dist = C*(linalg.norm(dif_mat, axis=0)**2/circ_rad - 1)
-    return 2*C*np.sum(d_phi(all_dist)*dif_mat/circ_rad, axis=1)
-
-def dloss(pos_mat, circ_mat, circ_rad, C):
-    return np.apply_along_axis(lambda x: compute_dloss(x, circ_mat, circ_rad, C), 0, pos_mat)
-
-def complete_dloss(pos_mat, circ_mat, circ_rad, C, K):
-    dloss_obstacles = dloss(pos_mat, circ_mat, circ_rad, C)[:,1:-1]
+def complete_dloss(pos_mat, circ_pos, circ_radius2, C, K):
+    dloss_obstacles = dloss(pos_mat, circ_pos, circ_radius2, C)[:,1:-1]
     diff_mat = -pos_mat[:,:-2] + 2*pos_mat[:,1:-1] - pos_mat[:,2:]
     zeros_mat = np.zeros(2)[:,np.newaxis]
     return np.c_[zeros_mat, dloss_obstacles + K*diff_mat, zeros_mat]
 
-def complete_loss(pos_mat, circ_mat, circ_rad, C, K):
-    loss_obstacles = loss(pos_mat, circ_mat, circ_rad, C)
-    loss_diff = sum(linalg.norm(pos_mat[:,1:] - pos_mat[:,:-1], axis=0))
-    return loss_obstacles + K*loss_diff
+def dloss(pos_mat, circ_pos, circ_radius2, C):
+    return np.apply_along_axis(lambda x: compute_dloss(x, circ_pos, circ_radius2, C), 0, pos_mat)
+
+def compute_dloss(curr_pos, circ_pos, circ_radius2, C):
+    dif_mat = curr_pos[:,np.newaxis] - circ_pos
+    all_dist = C*(linalg.norm(dif_mat, axis=0)**2/circ_radius2 - 1)
+    return 2*C*np.sum(d_phi(all_dist)*dif_mat/circ_radius2, axis=1)
