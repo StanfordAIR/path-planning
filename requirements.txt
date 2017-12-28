@@ -1,4 +1,14 @@
+attrs==17.3.0
+cycler==0.10.0
 decorator==4.1.2
+geopy==1.11.0
+matplotlib==2.1.1
 networkx==2.0
 numpy==1.13.3
-scipy==1.0.0
+pluggy==0.6.0
+py==1.5.2
+pyparsing==2.2.0
+pytest==3.3.1
+python-dateutil==2.6.1
+pytz==2017.3
+six==1.11.0
