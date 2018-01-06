@@ -24,8 +24,7 @@ class Planner:
         self.params = params
 
     def set_waypoints(self, waypoints: Path):
-        self.waypoints = waypoints
-#        self.waypoints_ft = self.environment.ll_to_ft(waypoints, copy)
+        self.waypoints = self.environment.ll_to_ft(np.array(waypoints).T, copy=False)
 
     def find_path(self, location: Location):
 
