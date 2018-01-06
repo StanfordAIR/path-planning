@@ -33,3 +33,19 @@ def test_environment_display():
 def test_planner_display():
     """ tests a simple planner display script for exceptions
     """
+    result_dir = RESULTS_DIR + 'test_planner_display/'
+    shutil.rmtree(result_dir, ignore_errors=True)
+    os.makedirs(result_dir)
+
+    env = nav.env.Environment(BOUNDARY, STATIC_OBS, ENV_PARAMS)
+    planner = nav.plan.Planner(env, PLANNER_PARAMS)
+
+    planner.set_waypoints(waypoints, copy=True)
+    quantized_path = planner.get_quantized_path()
+    path = planner.get_path()
+
+    
+    fig = plt.figure(figsize=(7,7))
+    ax = fig.add_subplot(111)
+    env.display(ax)
+    fig.savefig(result_dir + 'env')

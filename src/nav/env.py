@@ -45,7 +45,7 @@ class Environment:
         self.graph = FlightGraph(self.boundary_ft, self.static_obs_ft,
                                          self.granularity)
 
-    def ll_to_ft(self, points: np.ndarray, copy=False):
+    def ll_to_ft(self, points: np.ndarray, copy: bool = False):
         if copy:
             modified_points = np.copy(points)
         else:

@@ -32,9 +32,9 @@ class FlightGraph:
         self.granularity = granularity
         lat_size_ft = np.amax(boundary_ft[0])
         lon_size_ft = np.amax(boundary_ft[1])
-        lat_node_count = int(lat_size_ft // granularity) + 1
-        lon_node_count = int(lon_size_ft // granularity) + 1
-        base_graph = xgrid_graph(lat_node_count, lon_node_count)
+        self.max_row = int(lat_size_ft // granularity)
+        self.max_col = int(lon_size_ft // granularity)
+        base_graph = xgrid_graph(self.max_row + 1, self.max_col + 1)
 
         # remove nodes in obstacles and outside boundary
         rows = np.arange(lat_node_count)
@@ -68,3 +68,7 @@ class FlightGraph:
         self.base_graph = base_graph
         self.base_nodes_rc = np.array(list(base_graph)).T
         self.base_nodes_ft = self.base_nodes_rc * self.granularity
+
+    def to_graph(self, points_ft: np.ndarray):
+        #TODO
+        pass
