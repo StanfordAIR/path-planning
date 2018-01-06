@@ -6,7 +6,7 @@ Description
 Todo:
     * everything
 """
-from typing import Dict, Any
+from typing import List, Dict, Any
 
 import numpy as np
 import matplotlib.pyplot as plt
@@ -15,8 +15,9 @@ from geopy.distance import distance as distance_ll
 from nav.graph.graph import FlightGraph
 
 class Environment:
-    def __init__(self, boundary: np.ndarray,
-                 static_obs: np.ndarray, params: Dict[str,Any]):
+    def __init__(self, boundary: List,
+                 static_obs: List,
+                 params: Dict[str,Any]):
         """An Environment describes the static elements of the
         flight environment for a mission.
 
@@ -33,14 +34,14 @@ class Environment:
         self.granularity = params['granularity']
                        
         # set all fields that are constant between missions
-        self.boundary_ll = boundary
+        self.boundary_ll = np.array(boundary).T
         self.min_ll = np.amin(self.boundary_ll, axis=1)[:,np.newaxis] # keep shape
         self.max_ll = np.amax(self.boundary_ll, axis=1)[:,np.newaxis]
         self.lat_in_ft, self.lon_in_ft = self._ll_in_ft()
         self.boundary_ft = self.ll_to_ft(self.boundary_ll, copy=True)
 
         # set all fields that are constant within a mission
-        self.static_obs_ll = static_obs
+        self.static_obs_ll = np.array(static_obs).T
         self.static_obs_ft = self.ll_to_ft(self.static_obs_ll, copy=True) 
         self.graph = FlightGraph(self.boundary_ft, self.static_obs_ft,
                                          self.granularity)

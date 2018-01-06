@@ -38,10 +38,10 @@ The location of a point in (row, column) of the graph filling the flight space. 
 ## Navigator Classes
 
 ### Planner
-Top level and *only* external interface. Operates completely in Lat/Lon representation.
+Top level and *only* external interface. Interfaces in Lat/Lon representation and converts to Ft representation for all internal operations.
 
 ### Environment
-Responsible for maintaining the state of the flight area. Internally converts between Lat/Lon and Ft representations.
+Responsible for maintaining all static information about the flight area (such as the boundary and static obstacles), and for providing methods to the Planner class that rely on this static information, e.g. the conversion between Lat/Lon to Ft representations.
 
 ### FlightGraph
 Maintains the graph representation of the flight area. Internally converts between Ft and Row/Col representations
