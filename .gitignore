@@ -103,3 +103,6 @@ ENV/
 
 #venv
 venv/
+
+# other bs
+.DS_Store
