@@ -1,5 +1,5 @@
-from nav.graph import initial_graph
-from nav.graph import graph_path
+from nav.graph import initial as initial_graph
+from nav.graph import path as graph_path
 from nav.utility.classes import Location, Obstacle
 
 import networkx as nx
@@ -15,15 +15,15 @@ waypoints = [Location(0.0, 0.0), Location(100.0, 100.0)]
 
 initial_graph, origin = initial_graph.build(boundary, stat_obstacles, granularity)
 path, rn_path = graph_path.plan(waypoints, initial_graph, origin, granularity)
-print(path)
+# print(path)
 plt.figure()
 pos = nx.get_node_attributes(initial_graph, 'pos')
 nx.draw(initial_graph, pos, nodelist=path, font_weight='bold')
 
 quantization_distance = 1.5 
 quantized_path = graph_path.quantize(path, rn_path, quantization_distance)
-print(quantized_path.shape)
-print(quantized_path)
+# print(quantized_path.shape)
+# print(quantized_path)
 fig, ax = plt.subplots()
 plt.axis((-50.0,150.0,-50.0,150.0))
 ax.plot(quantized_path[0], quantized_path[1], '.--')

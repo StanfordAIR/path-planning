@@ -6,8 +6,8 @@ Todo:
 """
 from .xgrid import xgrid_graph
 
-from nav.utility.classes import Location
-from nav.utility.classes import Obstacle
+from .classes import Location
+from .classes import Obstacle
 
 from typing import List
 from typing import Tuple
