@@ -35,7 +35,7 @@ def build_graph(boundary_ft: np.ndarray, static_obs_ft: np.ndarray,
     for obs_idx in range(static_obs_ft.shape[1]):
         for node in graph:
             distance = static_obs_ft[0:2, obs_idx] - np.array([[node[0]], [node[1]]])
-            radius = 
+            r = static_obs_ft[2]
             if np.sqrt(np.sum(distance**2)) < r:
                 to_remove.add(node)
     for node in to_remove:

@@ -17,7 +17,7 @@ def point_to_point(boundary, waypoints, stat_obstacles, params, display=False, v
         fig, ax = plt.subplots(1, 3, figsize=(12,4))
     
     # Graph path
-    initial_graph, origin_loc = build_graph(boundary, stat_obstacles, params)
+    initial_graph, origin_loc = build_graph(boundary, stat_obstacles, granularity)
     graph_path = plan_graph_path(waypoints, initial_graph, origin_loc, params)
     
     pos = nx.get_node_attributes(initial_graph, 'pos')

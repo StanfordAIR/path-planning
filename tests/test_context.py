@@ -1,4 +1,4 @@
-from . import context
+import context
 
 import sys
 import nav
