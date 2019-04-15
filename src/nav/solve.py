@@ -35,16 +35,16 @@ def point_to_point(boundary, waypoints, stat_obstacles, params, display=False, v
             ax[1].add_artist(circle)
     
     # Flight Path
-    flight_path = optimize_path(quantized_path, boundary, stat_obstacles, params, verbose=verbose)
+    # flight_path = optimize_path(quantized_path, boundary, stat_obstacles, params, verbose=verbose)
 
-    if display:
-        ax[2].axis((-50.0, 150.0, -50.0, 150.0)) #TODO replace hardcoded values
-        ax[2].plot(flight_path[0], flight_path[1], '.')
-        for obs in stat_obstacles:
-            circle = plt.Circle((obs.location.lat, obs.location.lon),
-                                obs.radius, color='r', fill=False)
-            ax[2].add_artist(circle)
+    # if display:
+    #     ax[2].axis((-50.0, 150.0, -50.0, 150.0)) #TODO replace hardcoded values
+    #     ax[2].plot(flight_path[0], flight_path[1], '.')
+    #     for obs in stat_obstacles:
+    #         circle = plt.Circle((obs.location.lat, obs.location.lon),
+    #                             obs.radius, color='r', fill=False)
+    #         ax[2].add_artist(circle)
         
-        plt.show()
+    #     plt.show()
 
-    return flight_path
+    return quantized_path
