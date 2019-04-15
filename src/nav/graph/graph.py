@@ -63,8 +63,7 @@ class FlightGraph:
         for node_idx in node_idx_to_remove:
             base_graph.remove_node((nodes_rc[0, node_idx],
                                          nodes_rc[1, node_idx]))
-
-
+                                         
         self.base_graph = base_graph
         self.base_nodes_rc = np.array(list(base_graph)).T
         self.base_nodes_ft = self.base_nodes_rc * self.granularity

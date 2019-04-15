@@ -65,8 +65,8 @@ class Environment:
             y = self.static_obs_ft[0,obs_idx]
             x = self.static_obs_ft[1,obs_idx]
             r = self.static_obs_ft[2,obs_idx]
-            # circle = plt.Circle((x, y), r, color='r', zorder=0)
-            # ax.add_artist(circle)
+            circle = plt.Circle((x, y), r, color='r', zorder=0)
+            ax.add_artist(circle)
 
         # Draw Graph
         nodes_ft = self.graph.base_nodes_ft
