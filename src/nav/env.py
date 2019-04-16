@@ -55,6 +55,28 @@ class Environment:
         modified_points[1] *= self.lon_in_ft
         return modified_points
 
+    def ft_to_ll(self, points: np.ndarray, copy=False):
+        if copy:
+            modified_points = np.copy(points)
+        else:
+            modified_points = points #TODO check that this doesn't copy
+        modified_points[0] /= self.lat_in_ft
+        modified_points[1] /= self.lon_in_ft
+        modified_points[0:2] += self.min_ll
+        return modified_points
+
+    def point_ll_to_ft(self, point):
+        return (
+            (point[0] - self.min_ll[0][0]) * self.lat_in_ft,
+            (point[1] - self.min_ll[1][0]) * self.lon_in_ft,
+        )
+
+    def point_ft_to_ll(self, point):
+        return (
+            (point[0] / self.lat_in_ft) + self.min_ll[0][0],
+            (point[1] / self.lon_in_ft) + self.min_ll[1][0],
+        )
+
     def display(self, ax):
         # Draw Path
         ax.plot(Environment._wrap1(self.boundary_ft[1]),
