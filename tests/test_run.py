@@ -23,8 +23,8 @@ PARAMS = {'granularity': 100, 'quantization_distance': 7}
 # workflow - given boundaries, obstacles, granularity
 # build environment
 # build path
-# need to trim "in between" points
-# and then convert to lat/long
+# [need to] trim "in between" points
+# convert to lat/long
 
 # lat lng
 current_position = (38.1425, -76.426)
@@ -34,16 +34,24 @@ def round_to_granularity(env, val):
     granularity = env.graph.granularity
     return int(val / granularity)
 
+def trim_path(path):
+    new_path = []
+    last_diff = None
+    for i in range(1, len(path) - 1):
+        diff_vec = (path[i][1] - path[i - 1][1], path[i][0] - path[i - 1][0])
+        if diff_vec != last_diff:
+            new_path.append(path[i - 1])
+        last_diff = diff_vec
+    new_path.append(path[-1])
+    return new_path
+
 def build_path(env, cur, target):
     start = env.point_ll_to_ft(cur)
     end = env.point_ll_to_ft(target)
     start = (round_to_granularity(env, start[0]), round_to_granularity(env, start[1]))
     end = (round_to_granularity(env, end[0]), round_to_granularity(env, end[1]))
-    print('s, e', start, end)
     path = shortest_path(env.graph.base_graph, start, end, weight='weight')
-    # trim here if necessary
-
-    #
+    path = trim_path(path)
     path = np.array([[p[1] for p in path], [p[0] for p in path]]) * 100.0
     path = env.ft_to_ll(path)
     return path
@@ -64,9 +72,8 @@ def test_environment_display():
     fig = plt.figure(figsize=(7,7))
     ax = fig.add_subplot(111)
     env.display(ax)
-    # ax.plot([i[1] * env.graph.granularity for i in path], [i[0] * env.graph.granularity for i in path])
     path_ft = env.ll_to_ft(path)
-    print(path_ft)
+    # print(path_ft)
     ax.plot(path_ft[0], path_ft[1])
     fig.savefig(result_dir + 'env')
 
